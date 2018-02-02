@@ -1,0 +1,7 @@
+main: me.zombie_striker.music.Main
+version: 2.7.19
+name: Music
+commands:
+   music:
+      description: Adds extra sounds to your world.
+author: Zombie_Striker
