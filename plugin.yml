@@ -1,5 +1,5 @@
 main: me.zombie_striker.music.Main
-version: 2.7.19
+version: 2.7.21
 name: Music
 commands:
    music:

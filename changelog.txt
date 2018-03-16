@@ -1,3 +1,9 @@
+2.7.22
+	Fixed updater time-out error.
+
+2.7.21
+	Fixed Github updater
+
 2.7.20
 	Fixed NPE for craftbukkit servers
 	Changed channes to records materials.
