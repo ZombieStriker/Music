@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -34,6 +33,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -43,6 +43,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import me.zombie_striker.pluginconstructor.PluginConstructorAPI;
 
 public class Main extends JavaPlugin implements Listener {
 
@@ -70,20 +72,27 @@ public class Main extends JavaPlugin implements Listener {
 	List<JukeBox> jukeboxes = new ArrayList<JukeBox>();
 
 	public HashMap<UUID, JukeBox> jukeboxSetters = new HashMap<>();
+	public HashMap<UUID, JukeBox> chatterVolumeSetup = new HashMap<>();
 
 	public static String inventorytitle = "Select a station";
-	
+
+	Enchantment enchid;
+
 	public Loop getLoops(int id) {
-		for(Loop l : loops) {
-			if(l.id==id) {
+		for (Loop l : loops) {
+			if (l.id == id) {
 				return l;
 			}
 		}
 		return null;
 	}
 
-	public Inventory getInventory() {
-		Inventory i = Bukkit.createInventory(null, ((loops.size() / 9) + 1) * 9, inventorytitle);
+	protected static String changeVolButtonName = ChatColor.GREEN + " Change Volume";
+
+	public Inventory getInventory(JukeBox j) {
+
+		int addedIcons = 1;
+		Inventory i = Bukkit.createInventory(null, (((loops.size() + addedIcons) / 9) + 1) * 9, inventorytitle);
 		ItemStack no;
 		try {
 			no = new ItemStack(Material.BARRIER);
@@ -94,15 +103,45 @@ public class Main extends JavaPlugin implements Listener {
 		im.setDisplayName(ChatColor.RED + " Turn off jukebox");
 		no.setItemMeta(im);
 		i.addItem(no);
+
+		// 1 new item
+		ItemStack volume;
+		try {
+			volume = new ItemStack(Material.valueOf("COMMAND_CHAIN"));
+		} catch (Exception | Error e) {
+			volume = new ItemStack(Material.NOTE_BLOCK);
+		}
+		ItemMeta im2 = volume.getItemMeta();
+		im2.setDisplayName(changeVolButtonName);
+		volume.setItemMeta(im2);
+
+		i.addItem(volume);
+
 		for (Loop l : loops)
-			i.addItem(createJukeBox(l));
+			i.addItem(createJukeBox(l, j));
 		return i;
 	}
-	
 
-	public ItemStack createJukeBox(Loop l) {
-		Material[] records = {Material.RECORD_3,Material.RECORD_4,Material.RECORD_5,Material.RECORD_6,Material.RECORD_7,Material.RECORD_8,Material.RECORD_9,Material.RECORD_10,Material.RECORD_11,Material.RECORD_12};
-		ItemStack item = new ItemStack(l.isActive ? records[l.getInt()%records.length]: Material.OBSIDIAN);
+	public ItemStack createJukeBox(Loop l, JukeBox j) {
+		Material[] records = null;
+
+		if (Material.matchMaterial("MUSIC_DISC_MELLOHI") != null) {
+			records = new Material[] { Material.matchMaterial("MUSIC_DISC_MELLOHI"),
+					Material.matchMaterial("MUSIC_DISC_FAR"), Material.matchMaterial("MUSIC_DISC_STRAD"),
+					Material.matchMaterial("MUSIC_DISC_STAL"), Material.matchMaterial("MUSIC_DISC_WAIT"),
+					Material.matchMaterial("MUSIC_DISC_WARD"), Material.matchMaterial("MUSIC_DISC_CAT"),
+					Material.matchMaterial("MUSIC_DISC_BLOCKS"), Material.matchMaterial("MUSIC_DISC_13"),
+					Material.matchMaterial("MUSIC_DISC_11") };
+
+		} else {
+			records = new Material[] { Material.matchMaterial("RECORD_3"), Material.matchMaterial("RECORD_4"),
+					Material.matchMaterial("RECORD_5"), Material.matchMaterial("RECORD_6"),
+					Material.matchMaterial("RECORD_7"), Material.matchMaterial("RECORD_8"),
+					Material.matchMaterial("RECORD_9"), Material.matchMaterial("RECORD_10"),
+					Material.matchMaterial("RECORD_11"), Material.matchMaterial("RECORD_12") };
+
+		}
+		ItemStack item = new ItemStack(l.isActive ? records[l.getInt() % records.length] : Material.OBSIDIAN);
 		ItemMeta im = item.getItemMeta();
 		im.setDisplayName(ChatColor.GOLD + "" + l.id);
 		List<String> lore = new ArrayList<String>();
@@ -115,10 +154,15 @@ public class Main extends JavaPlugin implements Listener {
 		}
 		im.setLore(lore);
 		item.setItemMeta(im);
+		if (j.getStation() == l.getInt())
+			try {
+				item.addEnchantment(enchid, 1);
+			} catch (Error | Exception e4) {
+			}
 		return item;
 	}
 
-	@SuppressWarnings({ "deprecation", "unused" })
+	@SuppressWarnings({ "deprecation" })
 	public void onEnable() {
 		play();
 		if (!new File(getDataFolder(), "config.yml").exists())
@@ -143,8 +187,12 @@ public class Main extends JavaPlugin implements Listener {
 
 		if (getConfig().contains("Jukeboxes")) {
 			for (String key : getConfig().getConfigurationSection("Jukeboxes").getKeys(false)) {
+				int vol = 5;
+				if (getConfig().contains("Jukeboxes." + key + ".volume"))
+					vol = getConfig().getInt("Jukeboxes." + key + ".volume");
+
 				JukeBox j = new JukeBox((Location) getConfig().get("Jukeboxes." + key + ".location"),
-						UUID.fromString(getConfig().getString("Jukeboxes." + key + ".owner")));
+						UUID.fromString(getConfig().getString("Jukeboxes." + key + ".owner")), vol);
 				j.stationId = getConfig().getInt("Jukeboxes." + key + ".station");
 				j.setActive(getConfig().getBoolean("Jukeboxes." + key + ".active"));
 				jukeboxes.add(j);
@@ -218,8 +266,8 @@ public class Main extends JavaPlugin implements Listener {
 			loops.add(new Loop(this, j, b, x, y, z, w, uuid, r));
 		}
 
-		GithubUpdater.autoUpdate(this, "ZombieStriker", "Music","Music.jar");
-		//final Updater updater = new Updater(this, 91836, true);
+		GithubUpdater.autoUpdate(this, "ZombieStriker", "Music", "Music.jar");
+		// final Updater updater = new Updater(this, 91836, true);
 		// bStats metrics
 		Metrics met = new Metrics(this);
 		met.addCustomChart(new Metrics.SimplePie("sounds-loaded") {
@@ -247,14 +295,19 @@ public class Main extends JavaPlugin implements Listener {
 		 * (updater.updaterActive) updater.download(false); }
 		 * }.runTaskTimerAsynchronously(this, 20 * 60, 20 * 60 * 6);
 		 */
-		
-		
+
 		try {
 			if (Bukkit.getPluginManager().getPlugin("PluginConstructorAPI") == null)
-				GithubDependDownloader.autoUpdate(this, new File(getDataFolder().getParentFile(),"PluginConstructorAPI.jar"), "ZombieStriker", "PluginConstructorAPI", "PluginConstructorAPI.jar");
+				GithubDependDownloader.autoUpdate(this,
+						new File(getDataFolder().getParentFile(), "PluginConstructorAPI.jar"), "ZombieStriker",
+						"PluginConstructorAPI", "PluginConstructorAPI.jar");
 
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		try {
+			enchid = PluginConstructorAPI.registerGlowEnchantment();
+		} catch (Error | Exception e) {
 		}
 	}
 
@@ -281,8 +334,13 @@ public class Main extends JavaPlugin implements Listener {
 							for (JukeBox j : jukeboxes)
 								if (j.stationId == loop.id)
 									if (j.getActive())
-										j.jukeBox.getWorld().playSound(j.jukeBox, songname.get(loop.getThisSong()),
-												(float) 1.0 * loop.radius, 1);
+										if (j.volume == -1) {
+											for (Player p2 : j.jukeBox.getWorld().getPlayers())
+												p2.playSound(p2.getLocation(), songname.get(loop.getThisSong()),
+														(float) 500, 1);
+										} else
+											j.jukeBox.getWorld().playSound(j.jukeBox, songname.get(loop.getThisSong()),
+													(float) 1.0 * j.volume, 1);
 							// for (Location loc : loop.getLocations())
 							// loc.getWorld().playSound(loc, songname.get(loop.getThisSong()),
 							// (float) 1.0 * loop.radius, 1);
@@ -312,8 +370,8 @@ public class Main extends JavaPlugin implements Listener {
 				+ " Sets the radius for Station.\n The distance it will be heard is equal to 20*radius.");
 		player.sendMessage(ChatColor.BLUE + "/music clearQueue <StationID>:" + ChatColor.RESET
 				+ " Clears all songs for a station.");
-		player.sendMessage(ChatColor.BLUE + "/music removeStation <StationID>:" + ChatColor.RESET
-				+ " Removes a station.");
+		player.sendMessage(
+				ChatColor.BLUE + "/music removeStation <StationID>:" + ChatColor.RESET + " Removes a station.");
 		player.sendMessage(
 				ChatColor.BLUE + "/music ListStations :" + ChatColor.RESET + " Lists all stations that are active.");
 		if (player.isOp())

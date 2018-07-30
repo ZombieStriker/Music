@@ -1,7 +1,23 @@
 main: me.zombie_striker.music.Main
-version: 2.7.21
+version: 2.7.27
 name: Music
 commands:
    music:
       description: Adds extra sounds to your world.
+permissions:
+   music.*:
+     description: Gives access to all Music commands
+     children:
+       music.admin: true
+   music.admin:
+     description: Gives access to all Music commands
+     children:
+       music.changevolumetoglobal: true
+       music.default: true
+   music.default:
+     description: Allows users to change the station or volume for a jukebox
+     children:
+       music.changesong: true
+       music.changevolume: true
+       music.placejukebox: true
 author: Zombie_Striker

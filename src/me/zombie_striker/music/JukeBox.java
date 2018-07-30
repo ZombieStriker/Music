@@ -11,9 +11,12 @@ public class JukeBox {
 	public boolean active;
 	public UUID owner;
 	
-	public JukeBox(Location block,UUID owner) {
+	public int volume = 5;
+	
+	public JukeBox(Location block,UUID owner,int volume) {
 		this.jukeBox = block;
 		this.owner = owner;
+		this.volume = volume;
 	}
 	public void changeStation(int id){
 		this.stationId = id;

@@ -51,7 +51,6 @@ public class Updater {
     private int id = -1;
 
     private Plugin p;
-    @SuppressWarnings("FieldCanBeLocal")
     private boolean debug = false;
     private UpdateAvailability lastCheck = null;
     private UpdateResult lastUpdate = UpdateResult.NOT_UPDATED;

@@ -1,3 +1,19 @@
+2.7.27
+	Fixed npe error for 1.12
+
+2.7.26
+	Added pre-support for 1.13
+
+2.7.25
+	Fixed global volume
+	Added itemglow to the current station
+
+2.7.24
+	Added volume control to jukeboxes
+
+2.7.23
+	Fixed NPe
+
 2.7.22
 	Fixed updater time-out error.
 
