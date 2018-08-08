@@ -100,6 +100,7 @@ public class JukeBoxEvents implements Listener {
 						volume = -volume;
 				}
 				j.volume = volume;
+				e.setCancelled(true);
 				e.getPlayer().sendMessage(p.prefix + " Volume has been set to " + (volume==-1?"Global":volume));
 			} catch (Error | Exception e2) {
 				e.getPlayer().sendMessage(p.prefix + " Invalid input:\"" + e.getMessage()

@@ -1,3 +1,12 @@
+2.7.29	
+	Added ability to disable messages in the config
+
+2.7.28
+	Added 1.13 support
+	Added ability to set stations as "Random"
+	Fixed station overflow if the station was set multiple times
+	Fixed issue where setting volume could post the message to chat
+	Fixed locations being stored for stations (caused by legacy support)
 2.7.27
 	Fixed npe error for 1.12
 

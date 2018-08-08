@@ -55,6 +55,14 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 					return Names;
 
 				}
+				if (args[0].equalsIgnoreCase("toggleRandomizeSongs")) {
+					for (Loop l : p.loops) {
+						if (l.getOwner()
+								.equals(((Player) sender).getUniqueId()))
+							Names.add(l.getInt() + "");
+					}
+					return Names;
+				}
 				if (args[0].equalsIgnoreCase("clearQueue")) {
 					for (Loop l : p.loops) {
 						if (l.getOwner()
@@ -78,7 +86,9 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 					Names.add("ect.");
 					return Names;
 				}
-			} else if (args.length == 1) {
+			} else if (args.length == 1) {				
+				if ("toggleRandomizeSongs".toLowerCase().startsWith(args[0].toLowerCase()))
+					Names.add("toggleRandomizeSongs");
 				if ("getPack".toLowerCase().startsWith(args[0].toLowerCase()))
 					Names.add("getPack");
 				if ("setUpStation".toLowerCase().startsWith(
@@ -555,28 +565,33 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 									.equals(player.getName())
 							|| p.getConfig().getString("Loop." + number + ".p")
 									.equals(player.getUniqueId().toString())) {
-						p.getConfig().set("Loop." + number + ".l.x",
+						/*p.getConfig().set("Loop." + number + ".l.x",
 								player.getLocation().getBlockX());
 						p.getConfig().set("Loop." + number + ".l.y",
 								player.getLocation().getBlockY());
 						p.getConfig().set("Loop." + number + ".l.z",
 								player.getLocation().getBlockZ());
 						p.getConfig().set("Loop." + number + ".l.w",
-								player.getLocation().getWorld().getName());
+								player.getLocation().getWorld().getName());*/
+
+						player.sendMessage(ChatColor.BLUE + prefix
+								+ ChatColor.WHITE + "Putting Song " + args[1]
+								+ " for Station " + number + ". ");
+						
 						p.getConfig().set("Loop." + number + ".s", song);
 						p.getConfig().set("Loop." + number + ".p",
 								player.getUniqueId().toString());
 						p.getConfig().set("Loop." + number + ".r", 1);
 						p.saveConfig();
 						for (Loop l : p.loops) {
-							if (l.getInt() == number)
-								l.setActive(false);
+							if (l.getInt() == number) {
+								l.setSongs(song);
+								l.setRadius(1);
+								return true;
+							}
 						}
 						p.loops.add(new Loop(number, song,
 								player.getLocation(), player.getUniqueId(), 1));
-						player.sendMessage(ChatColor.BLUE + prefix
-								+ ChatColor.WHITE + "Putting Song " + args[1]
-								+ " for Station " + number + ". ");
 						player.sendMessage(ChatColor.BLUE + prefix
 								+ ChatColor.WHITE + "You can now select Station- "+number+" for Radio-Jukeboxes.");
 						player.sendMessage(ChatColor.BLUE + prefix
@@ -594,7 +609,66 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 							+ "You need to fill in these arguments : /music setUpStation <SongName> <Station> (use /music list and look for an ID that has not been taken)");
 				}
 			} else
+				
+				/**
+				 * randomize station
+				 */
 
+				if (args[0].equalsIgnoreCase("toggleRandomizeSongs")) {
+					if (args.length >= 1) {
+						int number = -1;
+						try {
+							number = Integer.parseInt(args[1]);
+						} catch (Exception E) {
+							player.sendMessage(ChatColor.BLUE + prefix
+									+ ChatColor.WHITE
+									+ "Plase provide a valid stationID");
+							return false;
+						}
+						Loop loop = null;
+						for (Loop l : p.loops) {
+							if (l.getInt() == number) {
+								if (l.getOwner().equals(player.getUniqueId())) {
+									loop=l;
+									break;
+								} else {
+									sender.sendMessage(prefix+" You do not own this station");
+									return true;
+								}
+							}
+						}
+						if (loop==null) {
+							player.sendMessage(ChatColor.BLUE + prefix
+									+ ChatColor.WHITE + "The station " + number
+									+ " has not been set up!");
+							return true;
+						}
+
+						if (player.isOp()
+								|| p.getConfig().getString("Loop." + number + ".p")
+										.equals(player.getName())
+								|| p.getConfig().getString("Loop." + number + ".p")
+										.equals(player.getUniqueId().toString())
+								|| p.getConfig().get("Loop." + number + ".p") == null) {
+							loop.isRandom=!loop.isRandom;
+							p.getConfig().set("Loop." + number + ".rand",loop.isRandom);
+							p.saveConfig();
+							
+							player.sendMessage(ChatColor.BLUE + prefix
+									+ ChatColor.WHITE + (loop.isRandom?"Randomizing":"Normalizing")+" Station " + number + ". ");
+						} else {
+							player.sendMessage(ChatColor.BLUE
+									+ prefix
+									+ ChatColor.WHITE
+									+ "You can't edit other people's station. Do '/music list' and find an empty station.");
+						}
+					} else {
+						player.sendMessage(ChatColor.BLUE
+								+ prefix
+								+ ChatColor.WHITE
+								+ "You need to fill in these arguments : /music addToQueue <SongName> <Station ID> (use /music list and find one that says null)");
+					}
+				} else
 			/**
 			 * Add loop to station
 			 */

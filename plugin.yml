@@ -1,6 +1,7 @@
 main: me.zombie_striker.music.Main
-version: 2.7.27
+version: 2.7.29
 name: Music
+api-version: 1.13
 commands:
    music:
       description: Adds extra sounds to your world.

@@ -57,6 +57,8 @@ public class Main extends JavaPlugin implements Listener {
 
 	protected String songversion = "2.0";
 
+	private boolean enableResourcepackAdvertisements = true;
+
 	int Streams = 220;
 	public String prefix = ChatColor.BLUE + "[Music]" + ChatColor.WHITE;
 	public Music music;
@@ -145,11 +147,16 @@ public class Main extends JavaPlugin implements Listener {
 		ItemMeta im = item.getItemMeta();
 		im.setDisplayName(ChatColor.GOLD + "" + l.id);
 		List<String> lore = new ArrayList<String>();
-		if (l.song.size() > 0 && l.activeSong >= 0) {
-			lore.add(ChatColor.WHITE + "Station Queue:");
-			for (int i = 0; i < l.song.size(); i++) {
-				lore.add(
-						(l.getActiveSong() == i ? ChatColor.WHITE : ChatColor.GRAY) + "-#" + i + " : " + l.song.get(i));
+
+		if (l.song != null) {
+			if (l.activeSong >= l.song.size())
+				l.activeSong = l.song.size() - 1;
+			if (l.song.size() > 0 && l.activeSong >= 0) {
+				lore.add(ChatColor.WHITE + "Station Queue:");
+				for (int i = 0; i < l.song.size(); i++) {
+					lore.add((l.getActiveSong() == i ? ChatColor.WHITE : ChatColor.GRAY) + "-#" + i + " : "
+							+ l.song.get(i));
+				}
 			}
 		}
 		im.setLore(lore);
@@ -171,6 +178,10 @@ public class Main extends JavaPlugin implements Listener {
 			getConfig().set("debug", false);
 			saveConfig();
 		}
+		if (!getConfig().contains("enableResourcepackAdvertisements")) {
+			getConfig().set("enableResourcepackAdvertisements", true);
+			saveConfig();
+		}
 		if (!getConfig().contains("stations")) {
 			getConfig().set("stations", 250);
 			saveConfig();
@@ -181,6 +192,7 @@ public class Main extends JavaPlugin implements Listener {
 		}
 		this.debug = getConfig().getBoolean("debug");
 		this.Streams = getConfig().getInt("stations");
+		this.enableResourcepackAdvertisements = getConfig().getBoolean("enableResourcepackAdvertisements");
 
 		music = new Music(this);
 		new GenerateFiles(this).run();
@@ -232,15 +244,17 @@ public class Main extends JavaPlugin implements Listener {
 			e.printStackTrace();
 		}
 
-		for (int j = 0; j < Streams; j++) {
-			if (!getConfig().contains("Loop." + j + ".l.x"))
-				continue;
-			int x = getConfig().getInt("Loop." + j + ".l.x");
-			int y = getConfig().getInt("Loop." + j + ".l.y");
-			int z = getConfig().getInt("Loop." + j + ".l.z");
-
-			String w = getConfig().getString("Loop." + j + ".l.w");
+		for (String j : getConfig().getConfigurationSection("Loop").getKeys(false)) {
+			/*
+			 * if (!getConfig().contains("Loop." + j + ".l.x")) continue; int x =
+			 * getConfig().getInt("Loop." + j + ".l.x"); int y = getConfig().getInt("Loop."
+			 * + j + ".l.y"); int z = getConfig().getInt("Loop." + j + ".l.z");
+			 * 
+			 * String w = getConfig().getString("Loop." + j + ".l.w");
+			 */
 			int r = getConfig().getInt("Loop." + j + ".r");
+			boolean rand = getConfig().contains("Loop." + j + ".rand") ? getConfig().getBoolean("Loop." + j + ".rand")
+					: false;
 			Object s = getConfig().get("Loop." + j + ".s");
 			Object owner = getConfig().get("Loop." + j + ".p");
 			List<String> b = null;
@@ -263,7 +277,9 @@ public class Main extends JavaPlugin implements Listener {
 					}
 				}
 			}
-			loops.add(new Loop(this, j, b, x, y, z, w, uuid, r));
+			Loop loop = new Loop(this, Integer.parseInt(j), b, /* x, y, z, w, */ uuid, r);
+			loop.isRandom = rand;
+			loops.add(loop);
 		}
 
 		GithubUpdater.autoUpdate(this, "ZombieStriker", "Music", "Music.jar");
@@ -325,9 +341,13 @@ public class Main extends JavaPlugin implements Listener {
 					if (!time.containsKey(i))
 						time.put(i, System.currentTimeMillis() + 1000);
 					if (time.get(i) <= System.currentTimeMillis()) {
-						loop.setActiveSong(loop.getActiveSong() + 1);
-						if (loop.getActiveSong() >= loop.getSongs().size())
-							loop.setActiveSong(0);
+						if (loop.isRandom) {
+							loop.setActiveSong((int) (Math.random() * loop.song.size()));
+						} else {
+							loop.setActiveSong(loop.getActiveSong() + 1);
+							if (loop.getActiveSong() >= loop.getSongs().size())
+								loop.setActiveSong(0);
+						}
 						if (songtime.containsKey(loop.getThisSong())) {
 							time.put(i, System.currentTimeMillis()
 									+ ((Math.round(songtime.get(loop.getThisSong())) * 1000)));
@@ -381,21 +401,22 @@ public class Main extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public void onJoin(final PlayerJoinEvent e) {
-		if (!getConfig().contains("UsersWithPacks." + e.getPlayer().getName())
-				|| !getConfig().getString("UsersWithPacks." + e.getPlayer().getName()).equals(this.songversion)) {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					if (!getConfig().contains("UsersWithPacks." + e.getPlayer().getName()) || !getConfig()
-							.getString("UsersWithPacks." + e.getPlayer().getName()).equals(songversion)) {
-						sendFunMessage(e.getPlayer());
-					} else {
-						cancel();
+		if (enableResourcepackAdvertisements)
+			if (!getConfig().contains("UsersWithPacks." + e.getPlayer().getName())
+					|| !getConfig().getString("UsersWithPacks." + e.getPlayer().getName()).equals(this.songversion)) {
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						if (!getConfig().contains("UsersWithPacks." + e.getPlayer().getName()) || !getConfig()
+								.getString("UsersWithPacks." + e.getPlayer().getName()).equals(songversion)) {
+							sendFunMessage(e.getPlayer());
+						} else {
+							cancel();
+						}
 					}
-				}
-			}.runTaskTimer(this, 20, 20 * 60 * 15);
-			// Send this message every fifteen minutes until they download it.
-		}
+				}.runTaskTimer(this, 20, 20 * 60 * 15);
+				// Send this message every fifteen minutes until they download it.
+			}
 	}
 
 	public void updateSongs() {

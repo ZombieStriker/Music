@@ -3,7 +3,6 @@ package me.zombie_striker.music;
 import java.util.List;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 public class Loop {
@@ -13,25 +12,26 @@ public class Loop {
 	int activeSong=-1;
 	//List<Location> location = new ArrayList<>();
 	boolean isActive = true;
-	private int Tid;
 	
 	int radius = 1;
 	
+	boolean isRandom = false;
+	
 	private UUID owner;
 	
-	public Loop(Main p, int id, List<String> song, final int x, final int y,final int z,final String world,UUID owner,int radius){
+	public Loop(Main p, int id, List<String> song,/* final int x, final int y,final int z,final String world,*/UUID owner,int radius){
 		this.id = id;
 		this.song = song;
 		this.owner = owner;
 		this.radius = radius;
-		Tid =Bukkit.getScheduler().scheduleSyncRepeatingTask(p, new Runnable(){
+		/*Tid =Bukkit.getScheduler().scheduleSyncRepeatingTask(p, new Runnable(){
 			public void run(){
 				if(Bukkit.getWorld(world)!=null){
 					//location.add(new Location(Bukkit.getWorld(world),x,y,z));
 					cancelTask();
 				}
 			}
-		}, 1, 20);
+		}, 1, 20);*/
 	}
 	public void setRadius(int i){
 		radius = i;
@@ -72,8 +72,5 @@ public class Loop {
 	}
 	public void setActive(boolean b){
 		this.isActive = b;
-	}
-	private void cancelTask(){
-		Bukkit.getScheduler().cancelTask(Tid);
 	}
 }
