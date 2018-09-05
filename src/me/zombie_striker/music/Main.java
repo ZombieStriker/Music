@@ -243,44 +243,45 @@ public class Main extends JavaPlugin implements Listener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		for (String j : getConfig().getConfigurationSection("Loop").getKeys(false)) {
-			/*
-			 * if (!getConfig().contains("Loop." + j + ".l.x")) continue; int x =
-			 * getConfig().getInt("Loop." + j + ".l.x"); int y = getConfig().getInt("Loop."
-			 * + j + ".l.y"); int z = getConfig().getInt("Loop." + j + ".l.z");
-			 * 
-			 * String w = getConfig().getString("Loop." + j + ".l.w");
-			 */
-			int r = getConfig().getInt("Loop." + j + ".r");
-			boolean rand = getConfig().contains("Loop." + j + ".rand") ? getConfig().getBoolean("Loop." + j + ".rand")
-					: false;
-			Object s = getConfig().get("Loop." + j + ".s");
-			Object owner = getConfig().get("Loop." + j + ".p");
-			List<String> b = null;
-			UUID uuid = null;
-			if (s instanceof String) {
-				b = new ArrayList<String>();
-				b.add((String) s);
-			}
-			if (s instanceof List) {
-				b = getConfig().getStringList("Loop." + j + ".s");
-			}
-			if (owner instanceof String) {
-				try {
-					uuid = UUID.fromString((String) owner);
-				} catch (Exception e) {
+		if (getConfig().contains("Loop"))
+			for (String j : getConfig().getConfigurationSection("Loop").getKeys(false)) {
+				/*
+				 * if (!getConfig().contains("Loop." + j + ".l.x")) continue; int x =
+				 * getConfig().getInt("Loop." + j + ".l.x"); int y = getConfig().getInt("Loop."
+				 * + j + ".l.y"); int z = getConfig().getInt("Loop." + j + ".l.z");
+				 * 
+				 * String w = getConfig().getString("Loop." + j + ".l.w");
+				 */
+				int r = getConfig().getInt("Loop." + j + ".r");
+				boolean rand = getConfig().contains("Loop." + j + ".rand")
+						? getConfig().getBoolean("Loop." + j + ".rand")
+						: false;
+				Object s = getConfig().get("Loop." + j + ".s");
+				Object owner = getConfig().get("Loop." + j + ".p");
+				List<String> b = null;
+				UUID uuid = null;
+				if (s instanceof String) {
+					b = new ArrayList<String>();
+					b.add((String) s);
+				}
+				if (s instanceof List) {
+					b = getConfig().getStringList("Loop." + j + ".s");
+				}
+				if (owner instanceof String) {
 					try {
-						uuid = Bukkit.getOfflinePlayer((String) owner).getUniqueId();
-					} catch (Exception e2) {
-						e2.printStackTrace();
+						uuid = UUID.fromString((String) owner);
+					} catch (Exception e) {
+						try {
+							uuid = Bukkit.getOfflinePlayer((String) owner).getUniqueId();
+						} catch (Exception e2) {
+							e2.printStackTrace();
+						}
 					}
 				}
+				Loop loop = new Loop(this, Integer.parseInt(j), b, /* x, y, z, w, */ uuid, r);
+				loop.isRandom = rand;
+				loops.add(loop);
 			}
-			Loop loop = new Loop(this, Integer.parseInt(j), b, /* x, y, z, w, */ uuid, r);
-			loop.isRandom = rand;
-			loops.add(loop);
-		}
 
 		GithubUpdater.autoUpdate(this, "ZombieStriker", "Music", "Music.jar");
 		// final Updater updater = new Updater(this, 91836, true);

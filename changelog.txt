@@ -1,3 +1,6 @@
+2.7.30	
+	Fixed Crash when you have a config with no loops.
+
 2.7.29	
 	Added ability to disable messages in the config
 
