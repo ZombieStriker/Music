@@ -360,8 +360,15 @@ public class Main extends JavaPlugin implements Listener {
 												p2.playSound(p2.getLocation(), songname.get(loop.getThisSong()),
 														(float) 500, 1);
 										} else
+											try {
 											j.jukeBox.getWorld().playSound(j.jukeBox, songname.get(loop.getThisSong()),
 													(float) 1.0 * j.volume, 1);
+											}catch(Error|Exception e54) {
+												for(Player player : j.jukeBox.getWorld().getPlayers()) {
+													player.playSound(j.jukeBox, songname.get(loop.getThisSong()),
+															(float) 1.0 * j.volume, 1);
+												}
+											}
 							// for (Location loc : loop.getLocations())
 							// loc.getWorld().playSound(loc, songname.get(loop.getThisSong()),
 							// (float) 1.0 * loop.radius, 1);
