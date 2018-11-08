@@ -71,18 +71,19 @@ public class JukeBoxEvents implements Listener {
 	public void clickJukebox(PlayerInteractEvent e) {
 		if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getClickedBlock() != null
 				&& e.getClickedBlock().getType() == Material.JUKEBOX) {
-			for (JukeBox j : new ArrayList<>(p.jukeboxes)) {
-				if (j.jukeBox != null && e.getClickedBlock() != null)
-					if (j.jukeBox.equals(e.getClickedBlock().getLocation())) {
-						if (j.owner.equals(e.getPlayer().getUniqueId())) {
-							e.getPlayer().openInventory(p.getInventory(j));
-							p.jukeboxSetters.put(e.getPlayer().getUniqueId(), j);
-						} else {
-							e.getPlayer().sendMessage(p.prefix + ChatColor.RED + " You do not own this jukebox!");
+			if (e.getPlayer().hasPermission("music.usejukebox"))
+				for (JukeBox j : new ArrayList<>(p.jukeboxes)) {
+					if (j.jukeBox != null && e.getClickedBlock() != null)
+						if (j.jukeBox.equals(e.getClickedBlock().getLocation())) {
+							if (j.owner.equals(e.getPlayer().getUniqueId())) {
+								e.getPlayer().openInventory(p.getInventory(j));
+								p.jukeboxSetters.put(e.getPlayer().getUniqueId(), j);
+							} else {
+								e.getPlayer().sendMessage(p.prefix + ChatColor.RED + " You do not own this jukebox!");
+							}
+							e.setCancelled(true);
 						}
-						e.setCancelled(true);
-					}
-			}
+				}
 		}
 	}
 
@@ -91,17 +92,17 @@ public class JukeBoxEvents implements Listener {
 		if (p.chatterVolumeSetup.containsKey(e.getPlayer().getUniqueId())) {
 			try {
 				JukeBox j = p.chatterVolumeSetup.get(e.getPlayer().getUniqueId());
-				int volume =-1;
-				if(e.getMessage().equalsIgnoreCase("global")) {
+				int volume = -1;
+				if (e.getMessage().equalsIgnoreCase("global")) {
 					volume = -1;
-				}else{
-					volume= Integer.parseInt(e.getMessage());
+				} else {
+					volume = Integer.parseInt(e.getMessage());
 					if (volume < 0)
 						volume = -volume;
 				}
 				j.volume = volume;
 				e.setCancelled(true);
-				e.getPlayer().sendMessage(p.prefix + " Volume has been set to " + (volume==-1?"Global":volume));
+				e.getPlayer().sendMessage(p.prefix + " Volume has been set to " + (volume == -1 ? "Global" : volume));
 			} catch (Error | Exception e2) {
 				e.getPlayer().sendMessage(p.prefix + " Invalid input:\"" + e.getMessage()
 						+ "\". The input should be a number. (Default=5)");
@@ -126,8 +127,8 @@ public class JukeBoxEvents implements Listener {
 				try {
 
 					if (e.getCurrentItem().getItemMeta().getDisplayName().equals(Main.changeVolButtonName)) {
-						if(!e.getWhoClicked().hasPermission("music.changevolume")) {
-							e.getWhoClicked().sendMessage(p.prefix+" You do not have permission to do this.");
+						if (!e.getWhoClicked().hasPermission("music.changevolume")) {
+							e.getWhoClicked().sendMessage(p.prefix + " You do not have permission to do this.");
 							e.getWhoClicked().closeInventory();
 							return;
 						}

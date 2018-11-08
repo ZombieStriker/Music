@@ -1,3 +1,7 @@
+2.7.32
+	Added "music.command" permission, to be able to use all /music commands.
+	Added "music.usejukebox" permission, which allows users to interact with the jukebox
+
 2.7.31
 	Added 1.8 support
 

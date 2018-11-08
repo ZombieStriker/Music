@@ -46,20 +46,16 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 	}
 
 	@Override
-	public List<String> onTabComplete(CommandSender sender, Command command,
-			String alias, String[] args) {
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 		List<String> Names = new ArrayList<String>();
 		if (command.getName().equalsIgnoreCase("music")) {
 			if (args.length == 2) {
-				if (args[0].equalsIgnoreCase("setUpStation")
-						|| args[0].equalsIgnoreCase("playonce")
+				if (args[0].equalsIgnoreCase("setUpStation") || args[0].equalsIgnoreCase("playonce")
 						|| args[0].equalsIgnoreCase("addToQueue")) {
 					File fo = new File(p.getDataFolder() + "/Music");
 
 					for (File ff : fo.listFiles()) {
-						if (ff.getName().replace(".txt", "").trim()
-								.toLowerCase()
-								.startsWith(args[1].toLowerCase())) {
+						if (ff.getName().replace(".txt", "").trim().toLowerCase().startsWith(args[1].toLowerCase())) {
 							Names.add(ff.getName().replace(".txt", "").trim());
 						}
 					}
@@ -68,24 +64,21 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 				}
 				if (args[0].equalsIgnoreCase("toggleRandomizeSongs")) {
 					for (Loop l : p.loops) {
-						if (l.getOwner()
-								.equals(((Player) sender).getUniqueId()))
+						if (l.getOwner().equals(((Player) sender).getUniqueId()))
 							Names.add(l.getInt() + "");
 					}
 					return Names;
 				}
 				if (args[0].equalsIgnoreCase("clearQueue")) {
 					for (Loop l : p.loops) {
-						if (l.getOwner()
-								.equals(((Player) sender).getUniqueId()))
+						if (l.getOwner().equals(((Player) sender).getUniqueId()))
 							Names.add(l.getInt() + "");
 					}
 					return Names;
 				}
 				if (args[0].equalsIgnoreCase("listStationSongs")) {
 					for (Loop l : p.loops) {
-						if (l.getOwner()
-								.equals(((Player) sender).getUniqueId()))
+						if (l.getOwner().equals(((Player) sender).getUniqueId()))
 							Names.add(l.getInt() + "");
 					}
 					return Names;
@@ -97,41 +90,33 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 					Names.add("ect.");
 					return Names;
 				}
-			} else if (args.length == 1) {				
+			} else if (args.length == 1) {
 				if ("toggleRandomizeSongs".toLowerCase().startsWith(args[0].toLowerCase()))
 					Names.add("toggleRandomizeSongs");
 				if ("getPack".toLowerCase().startsWith(args[0].toLowerCase()))
 					Names.add("getPack");
-				if ("setUpStation".toLowerCase().startsWith(
-						args[0].toLowerCase()))
+				if ("setUpStation".toLowerCase().startsWith(args[0].toLowerCase()))
 					Names.add("setUpStation");
-				if ("addToQueue".toLowerCase()
-						.startsWith(args[0].toLowerCase()))
+				if ("addToQueue".toLowerCase().startsWith(args[0].toLowerCase()))
 					Names.add("addToQueue");
 				if ("playonce".toLowerCase().startsWith(args[0].toLowerCase()))
 					Names.add("playonce");
 				if ("setRadius".toLowerCase().startsWith(args[0].toLowerCase()))
 					Names.add("setRadius");
 				if (sender.isOp())
-					if ("createsong".toLowerCase().startsWith(
-							args[0].toLowerCase()))
+					if ("createsong".toLowerCase().startsWith(args[0].toLowerCase()))
 						Names.add("createSong");
-				if ("removeFromQueue".toLowerCase().startsWith(
-						args[0].toLowerCase()))
+				if ("removeFromQueue".toLowerCase().startsWith(args[0].toLowerCase()))
 					Names.add("removeFromQueue");
-				if ("clearQueue".toLowerCase()
-						.startsWith(args[0].toLowerCase()))
+				if ("clearQueue".toLowerCase().startsWith(args[0].toLowerCase()))
 					Names.add("clearQueue");
-				if ("removeStation".toLowerCase()
-						.startsWith(args[0].toLowerCase()))
+				if ("removeStation".toLowerCase().startsWith(args[0].toLowerCase()))
 					Names.add("removeStation");
 				if ("help".toLowerCase().startsWith(args[0].toLowerCase()))
 					Names.add("help");
-				if ("listStations".toLowerCase().startsWith(
-						args[0].toLowerCase()))
+				if ("listStations".toLowerCase().startsWith(args[0].toLowerCase()))
 					Names.add("listStations");
-				if ("listStationSongs".toLowerCase().startsWith(
-						args[0].toLowerCase()))
+				if ("listStationSongs".toLowerCase().startsWith(args[0].toLowerCase()))
 					Names.add("listStationSongs");
 				return Names;
 			} else if (args.length == 3) {
@@ -153,40 +138,40 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 	}
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String arg2,
-			String[] args) {
+	public boolean onCommand(CommandSender sender, Command cmd, String arg2, String[] args) {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
+
+			if (!sender.hasPermission("music.commands")) {
+				sender.sendMessage(ChatColor.RED + " You do not have permission to use this command.");
+				return true;
+			}
+
 			/**
 			 * Help messages
 			 */
-			if (args.length == 0 || args[0].equalsIgnoreCase("help")
-					|| args[0].equalsIgnoreCase("?")) {
+			if (args.length == 0 || args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) {
 				p.showPlayerHelpMessage(player);
 				return true;
 			} else
 
 			if (args[0].equalsIgnoreCase("listStationSongs")) {
 				if (args.length < 2) {
-					sender.sendMessage(prefix
-							+ " Useage: /music listStationSongs <StationId>");
+					sender.sendMessage(prefix + " Useage: /music listStationSongs <StationId>");
 					return true;
 				}
 				int number = 0;
 				try {
 					number = Integer.parseInt(args[1]);
 				} catch (Exception E) {
-					player.sendMessage(ChatColor.BLUE
-							+ prefix
-							+ ChatColor.WHITE
+					player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
 							+ "Try to make sure you put in a station Id, currently you're looking for station "
 							+ args[1]);
 					return false;
 				}
 				for (Loop l : p.loops) {
 					if (l.getInt() == number) {
-						sender.sendMessage(prefix
-								+ " Songs and Ids for station-" + number);
+						sender.sendMessage(prefix + " Songs and Ids for station-" + number);
 						int k = 0;
 						for (String s : l.getSongs()) {
 							sender.sendMessage("-" + k + " : " + s);
@@ -195,8 +180,7 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 						return true;
 					}
 				}
-				sender.sendMessage(prefix + " The station " + number
-						+ " is empty.");
+				sender.sendMessage(prefix + " The station " + number + " is empty.");
 				return true;
 			} else
 			/**
@@ -205,49 +189,42 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 
 			if (args[0].equalsIgnoreCase("setRadius")) {
 				if (args.length < 3) {
-					sender.sendMessage(prefix
-							+ " Useage : /music setRadius <StationID> <radius>");
+					sender.sendMessage(prefix + " Useage : /music setRadius <StationID> <radius>");
 					return true;
 				}
 				Loop station = null;
 				try {
 					int id = Integer.parseInt(args[1]);
 					for (Loop l : p.loops) {
-						if (l.getInt() == id
-								&& l.getOwner().equals(player.getUniqueId())) {
+						if (l.getInt() == id && l.getOwner().equals(player.getUniqueId())) {
 							station = l;
 							break;
 						}
 					}
 				} catch (Exception e) {
-					sender.sendMessage(prefix
-							+ " You need to privde a valid station");
+					sender.sendMessage(prefix + " You need to privde a valid station");
 					return true;
 				}
 				if (station == null) {
-					sender.sendMessage(prefix
-							+ " This station does not exist. Please provide a valid station id");
+					sender.sendMessage(prefix + " This station does not exist. Please provide a valid station id");
 					return true;
 				}
 				int radius = -1;
 				try {
 					radius = Integer.parseInt(args[2]);
 				} catch (Exception e) {
-					sender.sendMessage(prefix
-							+ " You must provide a valid radius. Any number below "
+					sender.sendMessage(prefix + " You must provide a valid radius. Any number below "
 							+ (sender.isOp() ? 100 : 10) + " will work.");
 					return true;
 				}
 				if (radius > (sender.isOp() ? 100 : 10)) {
-					sender.sendMessage(prefix
-							+ " The radius provided is too large. Please use a smaller radius.");
+					sender.sendMessage(prefix + " The radius provided is too large. Please use a smaller radius.");
 					return true;
 				}
 				p.getConfig().set("Loop." + station.getInt() + ".r", radius);
 				station.setRadius(radius);
 				p.saveConfig();
-				sender.sendMessage(prefix + " Radius for station "
-						+ station.getInt() + " set to " + radius);
+				sender.sendMessage(prefix + " Radius for station " + station.getInt() + " set to " + radius);
 			} else
 			/**
 			 * Used to remove station
@@ -255,35 +232,28 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 
 			if (args[0].equalsIgnoreCase("removeFromStation")) {
 				if (args.length < 3) {
-					sender.sendMessage(prefix
-							+ " Useage: /music removeFromStation <Queue ID> <StationId>");
+					sender.sendMessage(prefix + " Useage: /music removeFromStation <Queue ID> <StationId>");
 					return true;
 				}
 				int id = 0;
 				try {
 					id = Integer.parseInt(args[1]);
 				} catch (Exception E) {
-					player.sendMessage(ChatColor.BLUE + prefix
-							+ ChatColor.WHITE
-							+ "Try to make sure you put in a song id");
+					player.sendMessage(
+							ChatColor.BLUE + prefix + ChatColor.WHITE + "Try to make sure you put in a song id");
 					return false;
 				}
 				int number = 0;
 				try {
 					number = Integer.parseInt(args[2]);
 				} catch (Exception E) {
-					player.sendMessage(ChatColor.BLUE
-							+ prefix
-							+ ChatColor.WHITE
+					player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
 							+ "Try to make sure you put in a station Id, currently you're looking for station "
 							+ args[2]);
 					return false;
 				}
-				if (player.isOp()
-						|| p.getConfig().getString("Loop." + number + ".p")
-								.equals(player.getName())
-						|| p.getConfig().getString("Loop." + number + ".p")
-								.equals(player.getUniqueId().toString())) {
+				if (player.isOp() || p.getConfig().getString("Loop." + number + ".p").equals(player.getName())
+						|| p.getConfig().getString("Loop." + number + ".p").equals(player.getUniqueId().toString())) {
 					List<String> songs = null;
 					for (Loop loop : p.loops) {
 						if (loop.getInt() == number) {
@@ -293,85 +263,67 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 					}
 					p.getConfig().set("Loop." + number, songs);
 					p.saveConfig();
-					player.sendMessage("Removing song " + id + " from station-"
-							+ number + " . ");
+					player.sendMessage("Removing song " + id + " from station-" + number + " . ");
 				} else {
-					player.sendMessage(ChatColor.BLUE
-							+ prefix
-							+ ChatColor.WHITE
+					player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
 							+ "You can't edit other people's stations. Do '/music list' to find an empty station.");
 				}
 			} else
-				/**
-				 * Used to rwhole station
-				 */
-
-				if (args[0].equalsIgnoreCase("removeStation")) {
-					if (args.length < 2) {
-						sender.sendMessage(prefix
-								+ " Useage: /music clearQueue <StationId>");
-						return true;
-					}
-					int number = 0;
-					try {
-						number = Integer.parseInt(args[1]);
-					} catch (Exception E) {
-						player.sendMessage(ChatColor.BLUE
-								+ prefix
-								+ ChatColor.WHITE
-								+ "Try to make sure you put in a station Id, currently you're looking for station "
-								+ args[1]);
-						return false;
-					}
-					if (player.isOp()
-							|| p.getConfig().getString("Loop." + number + ".p")
-									.equals(player.getName())
-							|| p.getConfig().getString("Loop." + number + ".p")
-									.equals(player.getUniqueId().toString())) {
-
-						p.getConfig().set("Loop." + number, null);
-						p.saveConfig();
-						for (Loop loop : p.loops) {
-							if (loop.getInt() == number) {
-								loop.setActive(false);
-								break;
-							}
-						}
-						player.sendMessage(p.prefix + " Removing Station " + number
-								+ ".");
-					} else {
-						player.sendMessage(ChatColor.BLUE
-								+ prefix
-								+ ChatColor.WHITE
-								+ "You can't edit other people's stations. Do '/music list' to find an empty station.");
-					}
-				} else
 			/**
 			 * Used to rwhole station
 			 */
 
-			if (args[0].equalsIgnoreCase("clearQueue")) {
+			if (args[0].equalsIgnoreCase("removeStation")) {
 				if (args.length < 2) {
-					sender.sendMessage(prefix
-							+ " Useage: /music clearQueue <StationId>");
+					sender.sendMessage(prefix + " Useage: /music clearQueue <StationId>");
 					return true;
 				}
 				int number = 0;
 				try {
 					number = Integer.parseInt(args[1]);
 				} catch (Exception E) {
-					player.sendMessage(ChatColor.BLUE
-							+ prefix
-							+ ChatColor.WHITE
+					player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
 							+ "Try to make sure you put in a station Id, currently you're looking for station "
 							+ args[1]);
 					return false;
 				}
-				if (player.isOp()
-						|| p.getConfig().getString("Loop." + number + ".p")
-								.equals(player.getName())
-						|| p.getConfig().getString("Loop." + number + ".p")
-								.equals(player.getUniqueId().toString())) {
+				if (player.isOp() || p.getConfig().getString("Loop." + number + ".p").equals(player.getName())
+						|| p.getConfig().getString("Loop." + number + ".p").equals(player.getUniqueId().toString())) {
+
+					p.getConfig().set("Loop." + number, null);
+					p.saveConfig();
+					for (Loop loop : p.loops) {
+						if (loop.getInt() == number) {
+							loop.setActive(false);
+							break;
+						}
+					}
+					player.sendMessage(p.prefix + " Removing Station " + number + ".");
+				} else {
+					player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
+							+ "You can't edit other people's stations. Do '/music list' to find an empty station.");
+				}
+			} else
+			/**
+			 * Used to rwhole station
+			 */
+
+			if (args[0].equalsIgnoreCase("clearQueue")) {
+				if (args.length < 2) {
+					sender.sendMessage(prefix + " Useage: /music clearQueue <StationId>");
+					return true;
+				}
+				int number = 0;
+				try {
+					number = Integer.parseInt(args[1]);
+				} catch (Exception E) {
+					player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
+							+ "Try to make sure you put in a station Id, currently you're looking for station "
+							+ args[1]);
+					return false;
+				}
+				if (player.isOp() || p.getConfig().getString("Loop." + number + ".p").equals(player.getName())
+						|| p.getConfig().getString("Loop." + number + ".p").equals(player.getUniqueId().toString())) {
 
 					List<String> songs = new ArrayList<>();
 					p.getConfig().set("Loop." + number, songs);
@@ -382,12 +334,9 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 							break;
 						}
 					}
-					player.sendMessage(p.prefix + " Clearing station " + number
-							+ ".");
+					player.sendMessage(p.prefix + " Clearing station " + number + ".");
 				} else {
-					player.sendMessage(ChatColor.BLUE
-							+ prefix
-							+ ChatColor.WHITE
+					player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
 							+ "You can't edit other people's stations. Do '/music list' to find an empty station.");
 				}
 			} else
@@ -400,8 +349,7 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 						String display = args[1];
 						String name = args[2];
 						int time = (int) (Double.parseDouble(args[3]) * 4);
-						File newFile = new File(p.musicdirectory.getPath()
-								+ "/" + display + ".txt");
+						File newFile = new File(p.musicdirectory.getPath() + "/" + display + ".txt");
 						if (newFile.exists()) {
 							player.sendMessage(prefix
 									+ "That song has already been registered. Look in the \"plugins/Music/Music\" folder of the main server.");
@@ -409,8 +357,7 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 						}
 						try {
 							newFile.createNewFile();
-							BufferedWriter bw = new BufferedWriter(
-									new FileWriter(newFile));
+							BufferedWriter bw = new BufferedWriter(new FileWriter(newFile));
 							// bw.write("DEFAULT");
 							// bw.newLine();
 							// bw.write("dev.bukkit.org/media/files/880/400/Music_-_HowThisWorks.zip");
@@ -424,22 +371,17 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 							bw.close();
 
 							p.updateSongs();
-							player.sendMessage(prefix
-									+ "Song creation was successful!");
+							player.sendMessage(prefix + "Song creation was successful!");
 						} catch (IOException e) {
 							e.printStackTrace();
-							player.sendMessage(prefix
-									+ " [Error]Could not create file.");
+							player.sendMessage(prefix + " [Error]Could not create file.");
 							return false;
 						}
 					} else {
-						player.sendMessage(prefix
-								+ " Useage: /music createSong <DisplayName> <Song> <Time>");
+						player.sendMessage(prefix + " Useage: /music createSong <DisplayName> <Song> <Time>");
 					}
 				} else {
-					player.sendMessage(prefix
-							+ ChatColor.RED
-							+ "You do not have the permission to create a new song.");
+					player.sendMessage(prefix + ChatColor.RED + "You do not have the permission to create a new song.");
 				}
 			} else
 
@@ -447,8 +389,7 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 			 * Get auth
 			 */
 			if (args[0].equalsIgnoreCase("Author1")) {
-				player.sendMessage(ChatColor.BLUE + prefix
-						+ " The author of this plugin is " + ChatColor.WHITE
+				player.sendMessage(ChatColor.BLUE + prefix + " The author of this plugin is " + ChatColor.WHITE
 						+ " Zombie_Striker");
 			} else
 			/**
@@ -459,46 +400,40 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 				int songs = 1;
 				File fo = new File(p.getDataFolder() + "/Music");
 				for (File ff : fo.listFiles()) {
-					sender.sendMessage(prefix + ChatColor.WHITE + " #" + songs
-							+ " : " + ff.getName().replace(".txt", "").trim());
+					sender.sendMessage(
+							prefix + ChatColor.WHITE + " #" + songs + " : " + ff.getName().replace(".txt", "").trim());
 					songs++;
 				}
 			} else
 			/**
 			 * get resource pack
 			 */
-			if (args[0].equalsIgnoreCase("get")
-					|| args[0].equalsIgnoreCase("getpack")) {
-				player.sendMessage(ChatColor.DARK_AQUA
-						+ StringUtils.repeat("=", 40));
+			if (args[0].equalsIgnoreCase("get") || args[0].equalsIgnoreCase("getpack")) {
+				player.sendMessage(ChatColor.DARK_AQUA + StringUtils.repeat("=", 40));
 				player.sendMessage(ChatColor.BLUE
 						+ "These are the file(s) full of music. Click the link and and download these to your .minecraft/resourcepacks file.");
-				player.sendMessage(ChatColor.DARK_AQUA
-						+ StringUtils.repeat("=", 40));
+				player.sendMessage(ChatColor.DARK_AQUA + StringUtils.repeat("=", 40));
 				File Fff = new File(p.getDataFolder(), "ResourcePacks.txt");
 				if (!Fff.exists()) {
-					player.sendMessage(ChatColor.RED
-							+ "ERROR:  File does not exist. Reload server.");
+					player.sendMessage(ChatColor.RED + "ERROR:  File does not exist. Reload server.");
 					return false;
 				}
 				try {
 					InputStream is = null;
 					is = new FileInputStream(Fff);
-					BufferedReader br = new BufferedReader(
-							new InputStreamReader(is));
+					BufferedReader br = new BufferedReader(new InputStreamReader(is));
 					for (int i = 0; i < 40; i++) {
 						String s = br.readLine();
 						if (s.contains("[&&END&&]")) {
 							break;
 						}
 						String s2 = br.readLine();
-						player.sendMessage(ChatColor.DARK_AQUA + ""
-								+ ChatColor.BOLD + "* NAME : " + ChatColor.AQUA
-								+ s);
+						player.sendMessage(
+								ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "* NAME : " + ChatColor.AQUA + s);
 						player.sendMessage(ChatColor.BOLD + s2);
 					}
 					br.close();
-					p.getConfig().set("UsersWithPacks."+sender.getName(), p.songversion);
+					p.getConfig().set("UsersWithPacks." + sender.getName(), p.songversion);
 					p.saveConfig();
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -515,22 +450,14 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 				}
 
 				if (jl > (p.Streams / 20)) {
-					player.sendMessage(ChatColor.GOLD
-							+ "We currently only have " + (p.loops.size() / 20)
-							+ " pages.");
+					player.sendMessage(ChatColor.GOLD + "We currently only have " + (p.loops.size() / 20) + " pages.");
 					return false;
 				} else {
-					player.sendMessage(ChatColor.GOLD + "Page " + jl
-							+ " out of " + (p.loops.size() / 20) + ".");
+					player.sendMessage(ChatColor.GOLD + "Page " + jl + " out of " + (p.loops.size() / 20) + ".");
 					for (Loop l : p.loops) {
 
-						player.sendMessage(ChatColor.BLUE
-								+ "Station "
-								+ l.getInt()
-								+ " is owned by "
-								+ ChatColor.WHITE
-								+ Bukkit.getOfflinePlayer(l.getOwner())
-										.getName());
+						player.sendMessage(ChatColor.BLUE + "Station " + l.getInt() + " is owned by " + ChatColor.WHITE
+								+ Bukkit.getOfflinePlayer(l.getOwner()).getName());
 					}
 				}
 
@@ -541,8 +468,7 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 			 * 
 			 */
 
-			if (args[0].equalsIgnoreCase("play")
-					|| args[0].equalsIgnoreCase("setUpStation")) {
+			if (args[0].equalsIgnoreCase("play") || args[0].equalsIgnoreCase("setUpStation")) {
 				if (args.length >= 2) {
 					int number = -1;
 					List<String> song = new ArrayList<>();
@@ -550,48 +476,38 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 					boolean hasSong = false;
 					File fo = new File(p.getDataFolder() + "/Music");
 					for (File ff : fo.listFiles()) {
-						if (ff.getName().replace(".txt", "").trim()
-								.equals(args[1]))
+						if (ff.getName().replace(".txt", "").trim().equals(args[1]))
 							hasSong = true;
 					}
 					if (!hasSong) {
-						player.sendMessage(ChatColor.BLUE
-								+ prefix
-								+ ChatColor.WHITE
+						player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
 								+ "That song is not on the list, make sure caps are correct");
 						return false;
 					}
 					try {
 						number = Integer.parseInt(args[2]);
 					} catch (Exception E) {
-						player.sendMessage(ChatColor.BLUE
-								+ prefix
-								+ ChatColor.WHITE
+						player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
 								+ "Try to make sure you put in numbers for the ID");
 						return false;
 					}
-					if (player.isOp()
-							|| p.getConfig().get("Loop." + number + ".p") == null
-							|| p.getConfig().getString("Loop." + number + ".p")
-									.equals(player.getName())
+					if (player.isOp() || p.getConfig().get("Loop." + number + ".p") == null
+							|| p.getConfig().getString("Loop." + number + ".p").equals(player.getName())
 							|| p.getConfig().getString("Loop." + number + ".p")
 									.equals(player.getUniqueId().toString())) {
-						/*p.getConfig().set("Loop." + number + ".l.x",
-								player.getLocation().getBlockX());
-						p.getConfig().set("Loop." + number + ".l.y",
-								player.getLocation().getBlockY());
-						p.getConfig().set("Loop." + number + ".l.z",
-								player.getLocation().getBlockZ());
-						p.getConfig().set("Loop." + number + ".l.w",
-								player.getLocation().getWorld().getName());*/
+						/*
+						 * p.getConfig().set("Loop." + number + ".l.x",
+						 * player.getLocation().getBlockX()); p.getConfig().set("Loop." + number +
+						 * ".l.y", player.getLocation().getBlockY()); p.getConfig().set("Loop." + number
+						 * + ".l.z", player.getLocation().getBlockZ()); p.getConfig().set("Loop." +
+						 * number + ".l.w", player.getLocation().getWorld().getName());
+						 */
 
-						player.sendMessage(ChatColor.BLUE + prefix
-								+ ChatColor.WHITE + "Putting Song " + args[1]
+						player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE + "Putting Song " + args[1]
 								+ " for Station " + number + ". ");
-						
+
 						p.getConfig().set("Loop." + number + ".s", song);
-						p.getConfig().set("Loop." + number + ".p",
-								player.getUniqueId().toString());
+						p.getConfig().set("Loop." + number + ".p", player.getUniqueId().toString());
 						p.getConfig().set("Loop." + number + ".r", 1);
 						p.saveConfig();
 						for (Loop l : p.loops) {
@@ -601,85 +517,71 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 								return true;
 							}
 						}
-						p.loops.add(new Loop(number, song,
-								player.getLocation(), player.getUniqueId(), 1));
-						player.sendMessage(ChatColor.BLUE + prefix
-								+ ChatColor.WHITE + "You can now select Station- "+number+" for Radio-Jukeboxes.");
-						player.sendMessage(ChatColor.BLUE + prefix
-								+ ChatColor.WHITE + "Sneak while placing a Jukebox to place a Radio-Jukeboxe.");
+						p.loops.add(new Loop(number, song, player.getLocation(), player.getUniqueId(), 1));
+						player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE + "You can now select Station- "
+								+ number + " for Radio-Jukeboxes.");
+						player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
+								+ "Sneak while placing a Jukebox to place a Radio-Jukeboxe.");
 					} else {
-						player.sendMessage(ChatColor.BLUE
-								+ prefix
-								+ ChatColor.WHITE
+						player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
 								+ "You can't edit other user's stations. Do '/music list' and find an empty station.");
 					}
 				} else {
-					player.sendMessage(ChatColor.BLUE
-							+ prefix
-							+ ChatColor.WHITE
+					player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
 							+ "You need to fill in these arguments : /music setUpStation <SongName> <Station> (use /music list and look for an ID that has not been taken)");
 				}
 			} else
-				
-				/**
-				 * randomize station
-				 */
 
-				if (args[0].equalsIgnoreCase("toggleRandomizeSongs")) {
-					if (args.length >= 1) {
-						int number = -1;
-						try {
-							number = Integer.parseInt(args[1]);
-						} catch (Exception E) {
-							player.sendMessage(ChatColor.BLUE + prefix
-									+ ChatColor.WHITE
-									+ "Plase provide a valid stationID");
-							return false;
-						}
-						Loop loop = null;
-						for (Loop l : p.loops) {
-							if (l.getInt() == number) {
-								if (l.getOwner().equals(player.getUniqueId())) {
-									loop=l;
-									break;
-								} else {
-									sender.sendMessage(prefix+" You do not own this station");
-									return true;
-								}
+			/**
+			 * randomize station
+			 */
+
+			if (args[0].equalsIgnoreCase("toggleRandomizeSongs")) {
+				if (args.length >= 1) {
+					int number = -1;
+					try {
+						number = Integer.parseInt(args[1]);
+					} catch (Exception E) {
+						player.sendMessage(
+								ChatColor.BLUE + prefix + ChatColor.WHITE + "Plase provide a valid stationID");
+						return false;
+					}
+					Loop loop = null;
+					for (Loop l : p.loops) {
+						if (l.getInt() == number) {
+							if (l.getOwner().equals(player.getUniqueId())) {
+								loop = l;
+								break;
+							} else {
+								sender.sendMessage(prefix + " You do not own this station");
+								return true;
 							}
 						}
-						if (loop==null) {
-							player.sendMessage(ChatColor.BLUE + prefix
-									+ ChatColor.WHITE + "The station " + number
-									+ " has not been set up!");
-							return true;
-						}
-
-						if (player.isOp()
-								|| p.getConfig().getString("Loop." + number + ".p")
-										.equals(player.getName())
-								|| p.getConfig().getString("Loop." + number + ".p")
-										.equals(player.getUniqueId().toString())
-								|| p.getConfig().get("Loop." + number + ".p") == null) {
-							loop.isRandom=!loop.isRandom;
-							p.getConfig().set("Loop." + number + ".rand",loop.isRandom);
-							p.saveConfig();
-							
-							player.sendMessage(ChatColor.BLUE + prefix
-									+ ChatColor.WHITE + (loop.isRandom?"Randomizing":"Normalizing")+" Station " + number + ". ");
-						} else {
-							player.sendMessage(ChatColor.BLUE
-									+ prefix
-									+ ChatColor.WHITE
-									+ "You can't edit other people's station. Do '/music list' and find an empty station.");
-						}
-					} else {
-						player.sendMessage(ChatColor.BLUE
-								+ prefix
-								+ ChatColor.WHITE
-								+ "You need to fill in these arguments : /music addToQueue <SongName> <Station ID> (use /music list and find one that says null)");
 					}
-				} else
+					if (loop == null) {
+						player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE + "The station " + number
+								+ " has not been set up!");
+						return true;
+					}
+
+					if (player.isOp() || p.getConfig().getString("Loop." + number + ".p").equals(player.getName())
+							|| p.getConfig().getString("Loop." + number + ".p").equals(player.getUniqueId().toString())
+							|| p.getConfig().get("Loop." + number + ".p") == null) {
+						loop.isRandom = !loop.isRandom;
+						p.getConfig().set("Loop." + number + ".rand", loop.isRandom);
+						p.saveConfig();
+
+						player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
+								+ (loop.isRandom ? "Randomizing" : "Normalizing") + " Station " + number + ". ");
+					} else {
+						player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
+								+ "You can't edit other people's station. Do '/music list' and find an empty station.");
+					}
+				} else {
+					player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
+							+ "You need to fill in these arguments : /music addToQueue <SongName> <Station ID> (use /music list and find one that says null)");
+				}
+			} else
 			/**
 			 * Add loop to station
 			 */
@@ -691,23 +593,19 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 					boolean hasSong = false;
 					File fo = new File(p.getDataFolder() + "/Music");
 					for (File ff : fo.listFiles()) {
-						if (ff.getName().replace(".txt", "").trim()
-								.equals(args[1]))
+						if (ff.getName().replace(".txt", "").trim().equals(args[1]))
 							hasSong = true;
 					}
 					if (!hasSong) {
-						player.sendMessage(ChatColor.BLUE
-								+ prefix
-								+ ChatColor.WHITE
+						player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
 								+ "That song is not on the list, make sure caps are correct");
 						return false;
 					}
 					try {
 						number = Integer.parseInt(args[2]);
 					} catch (Exception E) {
-						player.sendMessage(ChatColor.BLUE + prefix
-								+ ChatColor.WHITE
-								+ "Try to make sure you put in numbers");
+						player.sendMessage(
+								ChatColor.BLUE + prefix + ChatColor.WHITE + "Try to make sure you put in numbers");
 						return false;
 					}
 					boolean found = false;
@@ -723,42 +621,31 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 						}
 					}
 					if (!found) {
-						player.sendMessage(ChatColor.BLUE + prefix
-								+ ChatColor.WHITE + "The station " + number
+						player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE + "The station " + number
 								+ " has not been set up!");
 						return true;
 					}
 
-					if (player.isOp()
-							|| p.getConfig().getString("Loop." + number + ".p")
-									.equals(player.getName())
-							|| p.getConfig().getString("Loop." + number + ".p")
-									.equals(player.getUniqueId().toString())
+					if (player.isOp() || p.getConfig().getString("Loop." + number + ".p").equals(player.getName())
+							|| p.getConfig().getString("Loop." + number + ".p").equals(player.getUniqueId().toString())
 							|| p.getConfig().get("Loop." + number + ".p") == null) {
-						List<String> songsC = p.getConfig().getStringList(
-								"Loop." + number + ".s");
+						List<String> songsC = p.getConfig().getStringList("Loop." + number + ".s");
 						songsC.add(song);
 						p.getConfig().set("Loop." + number + ".s", songsC);
-						p.getConfig().set("Loop." + number + ".p",
-								player.getUniqueId().toString());
+						p.getConfig().set("Loop." + number + ".p", player.getUniqueId().toString());
 						p.saveConfig();
 						for (Loop l : p.loops) {
 							if (l.getInt() == number)
 								l.setSongs(songsC);
 						}
-						player.sendMessage(ChatColor.BLUE + prefix
-								+ ChatColor.WHITE + "Adding " + args[1]
+						player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE + "Adding " + args[1]
 								+ " to Station " + number + ". ");
 					} else {
-						player.sendMessage(ChatColor.BLUE
-								+ prefix
-								+ ChatColor.WHITE
+						player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
 								+ "You can't edit other people's station. Do '/music list' and find an empty station.");
 					}
 				} else {
-					player.sendMessage(ChatColor.BLUE
-							+ prefix
-							+ ChatColor.WHITE
+					player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
 							+ "You need to fill in these arguments : /music addToQueue <SongName> <Station ID> (use /music list and find one that says null)");
 				}
 			} else
@@ -776,23 +663,16 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 						hasSong = true;
 					}
 					if (!hasSong) {
-						player.sendMessage(ChatColor.BLUE
-								+ prefix
-								+ ChatColor.WHITE
+						player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
 								+ "That song is not on the list, make sure caps are correct");
 						return false;
 					}
 
 					for (Player p : ((Player) sender).getWorld().getPlayers())
-						p.playSound(((Player) sender).getLocation(),
-								this.p.songname.get(song), 1, 1);
-					player.sendMessage(ChatColor.BLUE + prefix
-							+ ChatColor.WHITE + "Playing Song " + song
-							+ " once. ");
+						p.playSound(((Player) sender).getLocation(), this.p.songname.get(song), 1, 1);
+					player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE + "Playing Song " + song + " once. ");
 				} else {
-					player.sendMessage(ChatColor.BLUE
-							+ prefix
-							+ ChatColor.WHITE
+					player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
 							+ "You need to fill in these arguments : /music playOnce SongName ");
 				}
 			} else
@@ -806,9 +686,7 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 					try {
 						id = Integer.parseInt(args[1]);
 					} catch (Exception E) {
-						player.sendMessage(ChatColor.BLUE
-								+ prefix
-								+ ChatColor.WHITE
+						player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
 								+ "Try to make sure you put in a track id, currently, you are looking for the track to remove"
 								+ args[1]);
 						return false;
@@ -817,9 +695,7 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 					try {
 						number = Integer.parseInt(args[2]);
 					} catch (Exception E) {
-						player.sendMessage(ChatColor.BLUE
-								+ prefix
-								+ ChatColor.WHITE
+						player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
 								+ "Try to make sure you put in a station Id, currently you're looking for station "
 								+ args[1]);
 						return false;
@@ -827,9 +703,7 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 					boolean found = false;
 					for (Loop l : p.loops) {
 						if (l.getInt() == number) {
-							if (player.isOp()
-									|| l.getOwner()
-											.equals(player.getUniqueId())) {
+							if (player.isOp() || l.getOwner().equals(player.getUniqueId())) {
 								found = true;
 								break;
 							} else {
@@ -839,17 +713,13 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 						}
 					}
 					if (!found) {
-						player.sendMessage(ChatColor.BLUE + prefix
-								+ ChatColor.WHITE + "The station " + number
+						player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE + "The station " + number
 								+ " has not been set up!");
 						return true;
 					}
 
-					if (player.isOp()
-							|| p.getConfig().getString("Loop." + number + ".p")
-									.equals(player.getName())
-							|| p.getConfig().getString("Loop." + number + ".p")
-									.equals(player.getUniqueId().toString())) {
+					if (player.isOp() || p.getConfig().getString("Loop." + number + ".p").equals(player.getName()) || p
+							.getConfig().getString("Loop." + number + ".p").equals(player.getUniqueId().toString())) {
 						String[] gg = null;
 						for (Loop l : p.loops) {
 							if (l.getInt() == number) {
@@ -858,26 +728,20 @@ public class MusicCommand implements CommandExecutor, TabCompleter {
 						}
 						p.getConfig().set("Loop." + number + ".s", gg);
 						p.saveConfig();
-						player.sendMessage("Removing song " + id
-								+ " from station " + number + ". ");
+						player.sendMessage("Removing song " + id + " from station " + number + ". ");
 					} else {
-						player.sendMessage(ChatColor.BLUE
-								+ prefix
-								+ ChatColor.WHITE
+						player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
 								+ "You can't edit other people's stations. Do '/music list' to find an empty station.");
 					}
 				} else {
-					player.sendMessage(ChatColor.BLUE
-							+ prefix
-							+ ChatColor.WHITE
+					player.sendMessage(ChatColor.BLUE + prefix + ChatColor.WHITE
 							+ "You need to fill in these arguments : /music removeFromQueue [LoopID] [Station] (/music list to find one that you own)");
 				}
 			} else {
 				p.showPlayerHelpMessage(player);
 			}
 		} else {
-			sender.sendMessage(prefix
-					+ " All commands must be sent as a player.");
+			sender.sendMessage(prefix + " All commands must be sent as a player.");
 		}
 		return true;
 	}
