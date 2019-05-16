@@ -115,9 +115,9 @@ public class JukeBoxEvents implements Listener {
 	public void click(InventoryClickEvent e) {
 		boolean clicked = false;
 		try {
-			clicked = e.getClickedInventory() != null && e.getClickedInventory().getTitle().equals(Main.inventorytitle);
+			clicked = e.getClickedInventory() != null && e.getView().getTitle().equals(Main.inventorytitle);
 		} catch (Exception | Error e2) {
-			clicked = e.getInventory() != null && e.getInventory().getTitle().equals(Main.inventorytitle);
+			clicked = e.getInventory() != null && e.getView().getTitle().equals(Main.inventorytitle);
 		}
 
 		if (clicked) {
