@@ -101,6 +101,8 @@ public class JukeBoxEvents implements Listener {
 						volume = -volume;
 				}
 				j.volume = volume;
+				p.getConfig().set("Jukeboxes." + j.getConfigName() + ".volume", volume);
+				p.saveConfig();
 				e.setCancelled(true);
 				e.getPlayer().sendMessage(p.prefix + " Volume has been set to " + (volume == -1 ? "Global" : volume));
 			} catch (Error | Exception e2) {

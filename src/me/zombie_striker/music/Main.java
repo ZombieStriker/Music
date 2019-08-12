@@ -27,10 +27,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.enchantments.Enchantment;
@@ -48,37 +45,27 @@ import me.zombie_striker.pluginconstructor.PluginConstructorAPI;
 
 public class Main extends JavaPlugin implements Listener {
 
-	protected HashMap<Integer, Long> time = new HashMap<Integer, Long>();
-	private HashMap<String, Double> songtime = new HashMap<String, Double>();
-	HashMap<String, String> songname = new HashMap<String, String>();
-
-	private List<String> resourcepackLinks = new ArrayList<String>();
-	List<Loop> loops = new ArrayList<Loop>();
-
-	protected String songversion = "2.0";
-
-	private boolean enableResourcepackAdvertisements = true;
-
-	int Streams = 220;
+	public static String inventorytitle = "Select a station";
+	protected static String changeVolButtonName = ChatColor.GREEN + " Change Volume";
 	public String prefix = ChatColor.BLUE + "[Music]" + ChatColor.WHITE;
 	public Music music;
-
-	private boolean debug;
-
+	public File musicdirectory;
+	public HashMap<UUID, JukeBox> jukeboxSetters = new HashMap<>();
+	public HashMap<UUID, JukeBox> chatterVolumeSetup = new HashMap<>();
+	protected HashMap<Integer, Long> time = new HashMap<Integer, Long>();
+	protected String songversion = "2.0";
+	HashMap<String, String> songname = new HashMap<String, String>();
+	List<Loop> loops = new ArrayList<Loop>();
+	int Streams = 220;
 	short data = 0;
 	int slotsleft = 108;
 	int test;
-
-	public File musicdirectory;
-
 	List<JukeBox> jukeboxes = new ArrayList<JukeBox>();
-
-	public HashMap<UUID, JukeBox> jukeboxSetters = new HashMap<>();
-	public HashMap<UUID, JukeBox> chatterVolumeSetup = new HashMap<>();
-
-	public static String inventorytitle = "Select a station";
-
 	Enchantment enchid;
+	private HashMap<String, Double> songtime = new HashMap<String, Double>();
+	private List<String> resourcepackLinks = new ArrayList<String>();
+	private boolean enableResourcepackAdvertisements = true;
+	private boolean debug;
 
 	public Loop getLoops(int id) {
 		for (Loop l : loops) {
@@ -88,8 +75,6 @@ public class Main extends JavaPlugin implements Listener {
 		}
 		return null;
 	}
-
-	protected static String changeVolButtonName = ChatColor.GREEN + " Change Volume";
 
 	public Inventory getInventory(JukeBox j) {
 
@@ -128,19 +113,19 @@ public class Main extends JavaPlugin implements Listener {
 		Material[] records = null;
 
 		if (Material.matchMaterial("MUSIC_DISC_MELLOHI") != null) {
-			records = new Material[] { Material.matchMaterial("MUSIC_DISC_MELLOHI"),
+			records = new Material[]{Material.matchMaterial("MUSIC_DISC_MELLOHI"),
 					Material.matchMaterial("MUSIC_DISC_FAR"), Material.matchMaterial("MUSIC_DISC_STRAD"),
 					Material.matchMaterial("MUSIC_DISC_STAL"), Material.matchMaterial("MUSIC_DISC_WAIT"),
 					Material.matchMaterial("MUSIC_DISC_WARD"), Material.matchMaterial("MUSIC_DISC_CAT"),
 					Material.matchMaterial("MUSIC_DISC_BLOCKS"), Material.matchMaterial("MUSIC_DISC_13"),
-					Material.matchMaterial("MUSIC_DISC_11") };
+					Material.matchMaterial("MUSIC_DISC_11")};
 
 		} else {
-			records = new Material[] { Material.matchMaterial("RECORD_3"), Material.matchMaterial("RECORD_4"),
+			records = new Material[]{Material.matchMaterial("RECORD_3"), Material.matchMaterial("RECORD_4"),
 					Material.matchMaterial("RECORD_5"), Material.matchMaterial("RECORD_6"),
 					Material.matchMaterial("RECORD_7"), Material.matchMaterial("RECORD_8"),
 					Material.matchMaterial("RECORD_9"), Material.matchMaterial("RECORD_10"),
-					Material.matchMaterial("RECORD_11"), Material.matchMaterial("RECORD_12") };
+					Material.matchMaterial("RECORD_11"), Material.matchMaterial("RECORD_12")};
 
 		}
 		ItemStack item = new ItemStack(l.isActive ? records[l.getInt() % records.length] : Material.OBSIDIAN);
@@ -169,7 +154,7 @@ public class Main extends JavaPlugin implements Listener {
 		return item;
 	}
 
-	@SuppressWarnings({ "deprecation" })
+	@SuppressWarnings({"deprecation"})
 	public void onEnable() {
 		play();
 		if (!new File(getDataFolder(), "config.yml").exists())
@@ -249,7 +234,7 @@ public class Main extends JavaPlugin implements Listener {
 				 * if (!getConfig().contains("Loop." + j + ".l.x")) continue; int x =
 				 * getConfig().getInt("Loop." + j + ".l.x"); int y = getConfig().getInt("Loop."
 				 * + j + ".l.y"); int z = getConfig().getInt("Loop." + j + ".l.z");
-				 * 
+				 *
 				 * String w = getConfig().getString("Loop." + j + ".l.w");
 				 */
 				int r = getConfig().getInt("Loop." + j + ".r");
@@ -286,7 +271,7 @@ public class Main extends JavaPlugin implements Listener {
 		GithubUpdater.autoUpdate(this, "ZombieStriker", "Music", "Music.jar");
 		// final Updater updater = new Updater(this, 91836, true);
 		// bStats metrics
-		Metrics met = new Metrics(this);
+		/*Metrics met = new Metrics(this);
 		met.addCustomChart(new Metrics.SimplePie("sounds-loaded") {
 			@Override
 			public String getValue() {
@@ -305,7 +290,7 @@ public class Main extends JavaPlugin implements Listener {
 				return String.valueOf(getConfig().getBoolean("auto-update"));
 			}
 		});
-
+*/
 		/*
 		 * new BukkitRunnable() { public void run() { // TODO: Works well. Make changes
 		 * for the updaters of // PixelPrinter and Music later. if
@@ -357,14 +342,25 @@ public class Main extends JavaPlugin implements Listener {
 									if (j.getActive())
 										if (j.volume == -1) {
 											for (Player p2 : j.jukeBox.getWorld().getPlayers())
-												p2.playSound(p2.getLocation(), songname.get(loop.getThisSong()),
-														(float) 500, 1);
+												try {
+													p2.playSound(p2.getLocation(), songname.get(loop.getThisSong()),
+															(float) 500, 1);
+												} catch (Error | Exception e43) {
+													p2.playSound(p2.getLocation(), songname.get(loop.getThisSong()), SoundCategory.RECORDS,
+															(float) 500, 1);
+												}
 										} else
 											try {
-											j.jukeBox.getWorld().playSound(j.jukeBox, songname.get(loop.getThisSong()),
-													(float) 1.0 * j.volume, 1);
-											}catch(Error|Exception e54) {
-												for(Player player : j.jukeBox.getWorld().getPlayers()) {
+												try {
+												j.jukeBox.getWorld().playSound(j.jukeBox, songname.get(loop.getThisSong()),
+														(float) 1.0 * j.volume, 1);
+												} catch (Error | Exception e544) {
+
+													j.jukeBox.getWorld().playSound(j.jukeBox, songname.get(loop.getThisSong()), SoundCategory.RECORDS,
+															(float) 1.0 * j.volume, 1);
+												}
+											} catch (Error | Exception e54) {
+												for (Player player : j.jukeBox.getWorld().getPlayers()) {
 													player.playSound(j.jukeBox, songname.get(loop.getThisSong()),
 															(float) 1.0 * j.volume, 1);
 												}

@@ -1,3 +1,8 @@
+2.7.34
+    Updated to maven.
+    Made sounds play on Music setting so some players can disable it if they want
+    Fixed volume on reload
+
 2.7.33
 	Updated to 1.14.
 	Updated to Maven
