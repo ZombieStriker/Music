@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import me.zombiestriker.customitemframework.CustomItemFramework;
 import org.bukkit.*;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.TabCompleter;
@@ -40,8 +41,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import me.zombie_striker.pluginconstructor.PluginConstructorAPI;
 
 public class Main extends JavaPlugin implements Listener {
 
@@ -63,8 +62,8 @@ public class Main extends JavaPlugin implements Listener {
 	List<JukeBox> jukeboxes = new ArrayList<JukeBox>();
 	Enchantment enchid;
 	private HashMap<String, Double> songtime = new HashMap<String, Double>();
-	private List<String> resourcepackLinks = new ArrayList<String>();
-	private boolean enableResourcepackAdvertisements = true;
+	//private List<String> resourcepackLinks = new ArrayList<String>();
+	//private boolean enableResourcepackAdvertisements = true;
 	private boolean debug;
 
 	public Loop getLoops(int id) {
@@ -146,11 +145,6 @@ public class Main extends JavaPlugin implements Listener {
 		}
 		im.setLore(lore);
 		item.setItemMeta(im);
-		if (j.getStation() == l.getInt())
-			try {
-				item.addEnchantment(enchid, 1);
-			} catch (Error | Exception e4) {
-			}
 		return item;
 	}
 
@@ -163,10 +157,6 @@ public class Main extends JavaPlugin implements Listener {
 			getConfig().set("debug", false);
 			saveConfig();
 		}
-		if (!getConfig().contains("enableResourcepackAdvertisements")) {
-			getConfig().set("enableResourcepackAdvertisements", true);
-			saveConfig();
-		}
 		if (!getConfig().contains("stations")) {
 			getConfig().set("stations", 250);
 			saveConfig();
@@ -175,9 +165,20 @@ public class Main extends JavaPlugin implements Listener {
 			getConfig().set("auto-update", true);
 			saveConfig();
 		}
+
+
+		if(!getConfig().contains("generateOggFiles")||getConfig().getBoolean("generateOggFiles")){
+			CustomItemFramework.registerResourcepack(Main.class.getResource("/resourcepack/"));
+			getConfig().set("generateOggFiles",false);
+			saveConfig();
+		}
+		CustomItemFramework.incrementResourcepackVersion(1);
+
+
+
+
 		this.debug = getConfig().getBoolean("debug");
 		this.Streams = getConfig().getInt("stations");
-		this.enableResourcepackAdvertisements = getConfig().getBoolean("enableResourcepackAdvertisements");
 
 		music = new Music(this);
 		new GenerateFiles(this).run();
@@ -206,6 +207,7 @@ public class Main extends JavaPlugin implements Listener {
 		this.getCommand("music").setExecutor((CommandExecutor) ce);
 		this.getCommand("music").setTabCompleter((TabCompleter) ce);
 
+		/*
 		File Fff2 = null;
 		for (File f2 : getDataFolder().listFiles()) {
 			if (f2.getName().toLowerCase().contains("ResourcePack".toLowerCase())) {
@@ -227,7 +229,7 @@ public class Main extends JavaPlugin implements Listener {
 			br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 		if (getConfig().contains("Loop"))
 			for (String j : getConfig().getConfigurationSection("Loop").getKeys(false)) {
 				/*
@@ -267,8 +269,6 @@ public class Main extends JavaPlugin implements Listener {
 				loop.isRandom = rand;
 				loops.add(loop);
 			}
-
-		GithubUpdater.autoUpdate(this, "ZombieStriker", "Music", "Music.jar");
 		// final Updater updater = new Updater(this, 91836, true);
 		// bStats metrics
 		/*Metrics met = new Metrics(this);
@@ -297,20 +297,6 @@ public class Main extends JavaPlugin implements Listener {
 		 * (updater.updaterActive) updater.download(false); }
 		 * }.runTaskTimerAsynchronously(this, 20 * 60, 20 * 60 * 6);
 		 */
-
-		try {
-			if (Bukkit.getPluginManager().getPlugin("PluginConstructorAPI") == null)
-				GithubDependDownloader.autoUpdate(this,
-						new File(getDataFolder().getParentFile(), "PluginConstructorAPI.jar"), "ZombieStriker",
-						"PluginConstructorAPI", "PluginConstructorAPI.jar");
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
-			enchid = PluginConstructorAPI.registerGlowEnchantment();
-		} catch (Error | Exception e) {
-		}
 	}
 
 	private void play() {
@@ -380,8 +366,6 @@ public class Main extends JavaPlugin implements Listener {
 		player.sendMessage(
 				ChatColor.BLUE + "/music <?,help> :" + ChatColor.RESET + " Displays all subcommands and their usages");
 		player.sendMessage(
-				ChatColor.BLUE + "/music <get, getPack>:" + ChatColor.RESET + " Lists all registered resourcepacks.");
-		player.sendMessage(
 				ChatColor.BLUE + "/music setUpStation <Song> <StationID> :" + ChatColor.RESET + " Creates a station.");
 		player.sendMessage(ChatColor.BLUE + "/music addToQueue <Song> <StationID> :" + ChatColor.RESET
 				+ " Adds the song to a station.");
@@ -403,7 +387,7 @@ public class Main extends JavaPlugin implements Listener {
 					+ " [OP ONLY] Creates the song file so players can hear the music.");
 	}
 
-	@EventHandler
+	/*@EventHandler
 	public void onJoin(final PlayerJoinEvent e) {
 		if (enableResourcepackAdvertisements)
 			if (!getConfig().contains("UsersWithPacks." + e.getPlayer().getName())
@@ -421,7 +405,7 @@ public class Main extends JavaPlugin implements Listener {
 				}.runTaskTimer(this, 20, 20 * 60 * 15);
 				// Send this message every fifteen minutes until they download it.
 			}
-	}
+	}*/
 
 	public void updateSongs() {
 		songtime.clear();

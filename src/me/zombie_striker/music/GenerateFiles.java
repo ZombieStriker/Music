@@ -27,7 +27,7 @@ public class GenerateFiles {
 
 	private Main p;
 	
-	private String version = "initSetupCompleteV2.0";
+	private String version = "initSetupCompleteV3.0";
 
 	public GenerateFiles(Main p) {
 		this.p = p;
@@ -38,13 +38,12 @@ public class GenerateFiles {
 		this.generateSubMusicSounds();
 		this.generateReadMeTXT();
 		this.generateTemplateTXT();
-		this.generateResourceTXT();
 		// this.generateStreamsTXT();
 
 		p.getConfig().set(version, true);
 		p.saveConfig();
 	}
-
+/*
 	public void generateResourceTXT() {
 		if (!(new File(p.getDataFolder() + "/ResourcePacks.txt")).exists()
 				|| !p.getConfig().contains(version)) {
@@ -75,7 +74,7 @@ public class GenerateFiles {
 				e.printStackTrace();
 			}
 		}
-	}
+	}*/
 
 	/*
 	 * public void generateStreamsTXT() {
@@ -97,38 +96,21 @@ public class GenerateFiles {
 				|| !p.getConfig().contains(version)) {
 			p.musicdirectory.mkdir();
 
-			addNotes("BrassRail", "brassrail", "15.0");
-			addNotes("Brazil", "brazil", "22.1");
 			addNotes("Closer", "closer", "21.1");
-			addNotes("Elevator_Music", "elevator_music", "27.4");
-			addNotes("Epic", "epic", "12.46");
-			addNotes("Epic2", "epic2", "7");
-			addNotes("Overture", "overture", "7");
-			addNotes("OldRecords", "oldrecords", "31.84");
-			addNotes("PortalRadio", "portalradio", "21.8");
-			addNotes("PunchOut", "punchout", "32.2");
-			addNotes("RobotRock", "robotrock", "8.46");
-			addNotes("RunningInThe90s", "runninginthe90s", "90.2");
-			addNotes("SkyrimTown", "skyrimtown", "42.6");
-			addNotes("SweetRascal", "sweetrascal", "30.8");
 			addNotes("ScienceCrusher", "sciencecrusher", "60.7");
 			addNotes("Tavern", "tavern", "33.4");
-			addNotes("Techno", "techno", "3.33");
 			addNotes("TetrisTrance", "tetristrance", "13.5");
 			addNotes("USSR", "ussr", "67.4");
-			addNotes("Violins", "violins", "16.2");
 			addNotes("WaterDrops", "waterdrop", "4");
-			
-			
-			
-			addNotes("Windmill", "windmill", "43.467");
-			addNotes("NumaNuma", "numanuma", "14.476");
-			addNotes("Lobby", "lobby", "12.328");
-			addNotes("AfterSchoolSpecial", "afterschoolspecial", "77.032");
-			addNotes("NyanCat", "nyancat", "24.062");
-			addNotes("IPhone", "iphone", "30.896");
-			addNotes("WindowsXP", "windowsxp", "61.544");
+			addNotes("AfterSchoolSpecial", "afterschoolspecial", "77.0");
+			addNotes("Forest", "forest", "9.0");
+			addNotes("WindowsXP", "winxpsong", "61.544");
 			addNotes("Piano", "piano", "5.142");
+			addNotes("HisTheme", "histheme", "79.0");
+			addNotes("Smashlovania", "smashlovania", "60.0");
+			addNotes("ThomasTheDootEngine", "thomasthedootengine", "37.0");
+			addNotes("WaterFall", "waterfall", "9.0");
+			addNotes("wind", "wind", "11.0");
 
 			Bukkit.getConsoleSender().sendMessage(
 					p.prefix + "Successfully created all sound files");

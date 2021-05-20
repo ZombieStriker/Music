@@ -1,3 +1,6 @@
+2.8.0
+    Updated to CustomItemFramework
+
 2.7.34
     Updated to maven.
     Made sounds play on Music setting so some players can disable it if they want

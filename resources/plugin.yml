@@ -2,6 +2,7 @@ main: me.zombie_striker.music.Main
 version: ${project.version}
 name: Music
 api-version: 1.13
+softdepend: [CustomItemFramework]
 commands:
    music:
       description: Adds extra sounds to your world.
